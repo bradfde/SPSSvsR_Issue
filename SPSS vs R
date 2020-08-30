@@ -1,0 +1,23 @@
+SPSS CODE: 
+
+GLM TPT_STL_UncertMean TPT_STL_CertMean TPT_STL_SafeMean BY AnyLifeAnxDisorder WITH PSWQtotal TPTBaseline_MeanSTLMag
+  /WSFACTOR=Threat 3 Simple(1) 
+  /CONTRAST(AnyLifeAnxDisorder)=Simple(1)
+  /METHOD=SSTYPE(3)
+  /PLOT=PROFILE(Threat*AnyLifeAnxDisorder)
+  /EMMEANS=TABLES(OVERALL) WITH(PSWQtotal=MEAN)
+  /EMMEANS=TABLES(Threat) WITH(PSWQtotal=MEAN)COMPARE ADJ(LSD)
+  /EMMEANS=TABLES(AnyLifeAnxDisorder) WITH(PSWQtotal=MEAN)COMPARE ADJ(LSD)
+  /EMMEANS=TABLES(AnyLifeAnxDisorder*Threat) WITH(PSWQtotal=MEAN)
+ /EMMEANS=TABLES(AnyLifeAnxDisorder*Threat) WITH(PSWQtotal=MEAN) WITH(TPTBaseline_MeanSTLMag=MEAN)COMPARE(Threat) ADJ(LSD)
+  /PRINT=DESCRIPTIVE ETASQ 
+  /CRITERIA=ALPHA(.05)
+  /WSDESIGN= Threat
+  /DESIGN= TPTBaseline_MeanSTLMag PSWQtotal AnyLifeAnxDisorder PSWQtotal*AnyLifeAnxDisorder.
+
+
+R CODE: 
+
+mOverall = lm(cbind(TPT_STL_UncertMean, TPT_STL_CertMean,TPT_STL_SafeMean) ~ TPTBaseline_MeanSTLMag+PSWQtotal+AnyLifeAnxDisorder+(AnyLifeAnxDisorder*PSWQtotal), data=d)
+idata = data.frame(ThreatType = factor(c(1,2,3)))
+summary(Anova(mOverall, idata=idata, idesign = ~ThreatType, type='III'), multivariate =FALSE)
